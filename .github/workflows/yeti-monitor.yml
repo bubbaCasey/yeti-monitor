@@ -39,8 +39,7 @@ jobs:
           git commit -m "Yeti inventory check: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || true
           git push
 
-      - name: Send Discord notification if in stock
-        if: steps.check.outputs.in_stock == 'true'
+       - name: Send Discord notification if in stock
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK }} \
             -H 'Content-Type: application/json' \
