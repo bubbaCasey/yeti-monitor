@@ -1,15 +1,13 @@
 name: Yeti 1000X Availability Check
 
+on:
+  schedule:
+    - cron: '0 0,12 * * *'
+  workflow_dispatch:
+
 permissions:
   contents: write
   issues: write
-  
-on:
-  schedule:
-    # Run at 00:00 UTC and 12:00 UTC every day
-    - cron: '0 0,12 * * *'
-  # Allow manual trigger from Actions tab
-  workflow_dispatch:
 
 jobs:
   check-inventory:
@@ -29,21 +27,19 @@ jobs:
 
       - name: Check Goal Zero Yeti 1000X availability
         id: check
-        run: |
-          python check_yeti.py
+        run: python check_yeti.py
 
-      - name: Parse results
+      - name: Display results
         if: always()
-        run: |
-          cat yeti_check_result.json
+        run: cat yeti_check_result.json
 
       - name: Commit and push results
         if: always()
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "Yeti Monitor Bot"
-          git add -A
-          git commit -m "Yeti inventory check: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
+          git config user.email "action@github.com"
+          git config user.name "Yeti Monitor Bot"
+          git add yeti_check_history.json yeti_check_result.json
+          git commit -m "Yeti inventory check: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || true
           git push
 
       - name: Create issue if in stock
@@ -54,6 +50,6 @@ jobs:
             github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: '🎉 Yeti 1000X Open Box IN STOCK',
-              body: '**Goal Zero Yeti 1000X (Open Box) is available!**\n\nCheck it out: https://goalzero.com/products/yeti-1000x-open-box\n\nTime: ' + new Date().toISOString()
+              title: '🎉 Yeti 1000X Open Box IN STOCK!',
+              body: '**Goal Zero Yeti 1000X (Open Box) is available!**\n\n🔗 [Buy now](https://goalzero.com/products/yeti-1000x-open-box)\n\n⏰ ' + new Date().toISOString()
             })
