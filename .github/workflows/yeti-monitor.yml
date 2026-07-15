@@ -1,5 +1,9 @@
 name: Yeti 1000X Availability Check
 
+permissions:
+  contents: write
+  issues: write
+  
 on:
   schedule:
     # Run at 00:00 UTC and 12:00 UTC every day
